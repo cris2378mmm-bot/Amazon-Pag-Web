@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon.com.mx | Tienda Online Demo - Electrónica, Hogar, Libros y Moda</title>
+    <!-- Fuente Inter desde Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN para estilos responsivos sin compilación -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuración personalizada de Tailwind para fuente y colores de marca -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                    colors: {
+                        amazon: {
+                            dark: '#131921',
+                            light: '#232f3e',
+                            slate: '#37475a',
+                            orange: '#febd69',
+                            orangeHover: '#f3a847',
+                            smile: '#ff9900',
+                            yellow: '#ffd814',
+                            yellowHover: '#f7ca00',
+                            bg: '#eaeded',
+                            prime: '#00a8e1',
+                            deal: '#cc0c39',
+                            bestseller: '#c45500'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-[#eaeded] text-[#0f1111] font-sans antialiased overflow-x-hidden flex flex-col min-h-screen">
+
+    <!-- ==================== HEADER PRINCIPAL ESTILO AMAZON ==================== -->
+    <header id="top" class="sticky top-0 z-40 shadow-md">
+        <!-- Barra Superior (#131921) -->
+        <div class="bg-[#131921] text-white px-3 sm:px-4 py-2">
+            <div class="max-w-[1500px] mx-auto flex flex-wrap lg:flex-nowrap items-center justify-between gap-2 sm:gap-3">
+
+                <!-- 1. Logotipo estilo Amazon con flecha/sonrisa naranja SVG -->
+                <button
+                    type="button"
+                    onclick="resetAllFilters()"
+                    aria-label="Inicio de Amazon México Demo"
+                    class="flex flex-col items-start px-2 py-1 rounded border border-transparent hover:border-white transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-[#febd69]"
+                >
+                    <div class="flex items-baseline leading-none">
+                        <span class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">amazon</span>
+                        <span class="text-xs font-medium text-gray-300 ml-0.5">.com.mx</span>
+                    </div>
+                    <!-- Flecha/sonrisa naranja característica -->
+                    <svg class="w-16 sm:w-20 h-3 -mt-0.5 text-[#ff9900]" viewBox="0 0 110 18" fill="none" aria-hidden="true">
+                        <path d="M5 4C32 16 74 16 99 5" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+                        <path d="M92 2.5L102 4.5L97 13" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+
+                <!-- 2. Selector de Ubicación (visible en tablet/escritorio) -->
+                <button
+                    type="button"
+                    onclick="openLocationModal()"
+                    class="hidden md:flex items-center gap-1.5 px-2 py-1.5 rounded border border-transparent hover:border-white transition-colors shrink-0 text-left focus:outline-none focus:ring-2 focus:ring-[#febd69]"
+                >
+                    <svg class="w-5 h-5 text-white shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <div class="leading-tight">
+                        <span class="block text-[11px] text-gray-300">Enviar a</span>
+                        <span id="headerLocationText" class="block text-sm font-bold text-white truncate max-w-[120px]">México</span>
+                    </div>
+                </button>
+
+                <!-- 3. Barra de Búsqueda en Tiempo Real (ordena al final en móvil para dar 100% ancho) -->
+                <form
+                    onsubmit="handleSearchSubmit(event)"
+                    class="order-last lg:order-none w-full lg:flex-1 flex items-stretch h-11 rounded-md overflow-hidden bg-white focus-within:ring-[3px] focus-within:ring-[#ff9900] transition-shadow"
+                    role="search"
+                >
+                    <!-- Selector de categoría integrado en la búsqueda -->
+                    <label for="searchCategorySelect" class="sr-only">Categoría de búsqueda</label>
+                    <select
+                        id="searchCategorySelect"
+                        onchange="handleCategorySelectChange(this.value)"
+                        class="bg-[#e6e6e6] hover:bg-[#d4d4d4] text-[#0f1111] text-xs sm:text-sm font-medium px-2 sm:px-3 border-r border-gray-300 focus:outline-none cursor-pointer max-w-[115px] sm:max-w-[150px] truncate"
+                    >
+                        <option value="Todo">Todo</option>
+                        <option value="Ofertas del Día">Ofertas</option>
+                        <option value="Electrónica">Electrónica</option>
+                        <option value="Hogar">Hogar</option>
+                        <option value="Libros">Libros</option>
+                        <option value="Moda">Moda</option>
+                    </select>
+
+                    <!-- Campo de búsqueda en vivo -->
+                    <div class="relative flex-1 flex items-center">
+                        <label for="searchInput" class="sr-only">Buscar productos en Amazon Demo</label>
+                        <input
+                            id="searchInput"
+                            type="text"
+                            placeholder="Buscar audífonos, cafetera, libros, tenis..."
+                            autocomplete="off"
+                            oninput="handleLiveSearch(this.value)"
+                            class="w-full h-full px-3 pr-8 text-sm text-[#0f1111] placeholder-gray-500 focus:outline-none"
+                        />
+                        <!-- Botón limpiar búsqueda -->
+                        <button
+                            id="clearSearchBtn"
+                            type="button"
+                            onclick="clearSearchInput()"
+                            aria-label="Limpiar búsqueda"
+                            class="hidden absolute right-2 p-1 text-gray-400 hover:text-gray-700 rounded-full"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Botón Lupa Naranja (#febd69) -->
+                    <button
+                        type="submit"
+                        aria-label="Buscar"
+                        class="bg-[#febd69] hover:bg-[#f3a847] active:bg-[#e59835] text-[#131921] px-4 flex items-center justify-center transition-colors shrink-0"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- 4. Acciones Derecha: Cuenta, Pedidos y Carrito -->
+                <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+                    <!-- Enlace decorativo: Cuenta y Listas -->
+                    <button
+                        type="button"
+                        onclick="openInfoModal('account')"
+                        class="hidden sm:flex flex-col items-start px-2.5 py-1.5 rounded border border-transparent hover:border-white transition-colors leading-tight focus:outline-none focus:ring-2 focus:ring-[#febd69]"
+                    >
+                        <span class="text-[11px] text-gray-300">Hola, Identifícate</span>
+                        <span class="text-xs sm:text-sm font-bold text-white flex items-center gap-0.5">
+                            Cuenta y Listas
+                            <svg class="w-3 h-3 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                            </svg>
+                        </span>
+                    </button>
+
+                    <!-- Enlace interactivo: Devoluciones y Pedidos -->
+                    <button
+                        type="button"
+                        onclick="openOrdersModal()"
+                        class="hidden md:flex flex-col items-start px-2.5 py-1.5 rounded border border-transparent hover:border-white transition-colors leading-tight focus:outline-none focus:ring-2 focus:ring-[#febd69]"
+                    >
+                        <span class="text-[11px] text-gray-300">Devoluciones</span>
+                        <span class="text-xs sm:text-sm font-bold text-white">y Pedidos</span>
+                    </button>
+
+                    <!-- Botón de Carrito con Contador Dinámico -->
+                    <button
+                        type="button"
+                        onclick="toggleCartDrawer(true)"
+                        aria-label="Abrir carrito de compras"
+                        class="relative flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-transparent hover:border-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#febd69]"
+                    >
+                        <div class="relative">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
+                            </svg>
+                            <!-- Contador dinámico naranja -->
+                            <span
+                                id="cartBadgeCount"
+                                class="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1 rounded-full bg-[#ff9900] text-[#131921] text-xs font-extrabold flex items-center justify-center shadow transition-transform duration-200"
+                            >
+                                0
+                            </span>
+                        </div>
+                        <span class="hidden sm:inline text-sm font-bold text-white self-end pb-0.5">Carrito</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subbarra de Navegación (#232f3e) -->
+        <nav aria-label="Categorías principales" class="bg-[#232f3e] text-white px-3 sm:px-4">
+            <div class="max-w-[1500px] mx-auto flex items-center justify-between gap-3 py-1.5">
+                <!-- Filtros interactivos por categoría -->
+                <div id="categoryNavButtons" class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                    <!-- Los botones se renderizan/actualizan dinámicamente desde JS -->
+                </div>
+
+                <!-- Distintivo de envío Prime -->
+                <div class="hidden xl:flex items-center gap-2 shrink-0 pl-3 border-l border-gray-600">
+                    <span class="inline-flex items-center gap-1 bg-[#1a242f] px-2.5 py-1 rounded-full border border-[#00a8e1]/40 text-xs">
+                        <span class="font-extrabold italic text-[#00a8e1] tracking-tight">prime</span>
+                        <svg class="w-3.5 h-3.5 text-[#ff9900]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <span class="text-gray-200 font-medium">Envíos rápidos GRATIS a México</span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Franja móvil de ubicación rápida -->
+        <div class="md:hidden bg-[#37475a] text-white px-3 py-1.5 text-xs flex items-center justify-between">
+            <button type="button" onclick="openLocationModal()" class="flex items-center gap-1.5 truncate">
+                <svg class="w-4 h-4 text-[#febd69] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span>Enviar a <strong id="mobileLocationText">México</strong></span>
+            </button>
+            <button type="button" onclick="openOrdersModal()" class="text-[#febd69] font-semibold shrink-0 ml-2">
+                Mis Pedidos
+            </button>
+        </div>
+    </header>
+
+    <!-- ==================== BANNER PRINCIPAL (HERO) CON DEGRADADO ==================== -->
+    <section class="relative bg-gradient-to-b from-[#131921] via-[#232f3e] to-[#eaeded] pt-6 sm:pt-10 pb-12 sm:pb-16 px-3 sm:px-6 overflow-hidden">
+        <!-- Elementos decorativos sutiles de fondo -->
+        <div class="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-[#ff9900]/15 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div class="pointer-events-none absolute top-16 left-0 w-72 h-72 bg-[#00a8e1]/15 rounded-full blur-3xl -translate-x-1/2"></div>
+
+        <div class="relative max-w-[1500px] mx-auto">
+            <!-- Tarjeta principal del Hero -->
+            <div class="rounded-2xl bg-gradient-to-r from-[#1a2433] via-[#243447] to-[#2e4057] text-white p-6 sm:p-10 shadow-xl border border-white/10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                <div class="max-w-2xl space-y-4">
+                    <div class="inline-flex items-center gap-2 bg-[#ff9900]/20 border border-[#ff9900]/40 text-[#febd69] text-xs sm:text-sm font-semibold px-3 py-1 rounded-full">
+                        <span class="w-2 h-2 rounded-full bg-[#ff9900] animate-pulse"></span>
+                        Ofertas especiales de temporada en México
+                    </div>
+                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+                        Todo lo que necesitas, con entregas en <span class="text-[#febd69]">tiempo récord</span>
+                    </h1>
+                    <p class="text-sm sm:text-base text-gray-200 leading-relaxed max-w-xl">
+                        Descubre descuentos imperdibles en Electrónica, Hogar, Libros y Moda con garantía de satisfacción y precios en pesos mexicanos.
+                    </p>
+                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                        <button
+                            type="button"
+                            onclick="exploreDeals()"
+                            class="bg-[#ffd814] hover:bg-[#f7ca00] active:bg-[#f0b800] text-[#0f1111] font-bold text-sm sm:text-base px-6 py-3 rounded-full shadow-md transition-all flex items-center gap-2"
+                        >
+                            <span>Explorar Ofertas del Día</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                            </svg>
+                        </button>
+                        <button
+                            type="button"
+                            onclick="selectCategory('Todo'); scrollToCatalog();"
+                            class="bg-white/10 hover:bg-white/20 text-white border border-white/25 font-semibold text-sm sm:text-base px-5 py-3 rounded-full transition-colors"
+                        >
+                            Ver todo el catálogo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Insignia visual destacada Prime -->
+                <div class="w-full lg:w-auto lg:min-w-[270px] bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl p-5 flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs uppercase tracking-wider text-gray-300 font-semibold">Beneficio exclusivo</span>
+                        <span class="inline-flex items-center gap-0.5 text-lg font-extrabold italic text-[#00a8e1]">
+                            prime
+                            <svg class="w-4 h-4 text-[#ff9900]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-100">
+                        Envíos ilimitados <strong class="text-white">GRATIS</strong> en un día en millones de artículos seleccionados.
+                    </p>
+                    <div class="flex items-center gap-2 text-xs text-[#febd69] font-medium pt-1 border-t border-white/10">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        <span>Ahorra hasta 25% hoy en ofertas activas</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjetas de Beneficios de Marca y Confianza del Consumidor -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+                <!-- Beneficio 1 -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200/80 flex items-center gap-3.5 hover:shadow-md transition-shadow">
+                    <div class="w-11 h-11 rounded-full bg-[#e6f7fc] text-[#007185] flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-[#0f1111]">Envío gratis rápido</h2>
+                        <p class="text-xs text-gray-600 mt-0.5">Entrega en 24-48 horas a todo México en artículos Prime.</p>
+                    </div>
+                </div>
+
+                <!-- Beneficio 2 -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200/80 flex items-center gap-3.5 hover:shadow-md transition-shadow">
+                    <div class="w-11 h-11 rounded-full bg-[#fef3e6] text-[#c45500] flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-[#0f1111]">Compra protegida A-Z</h2>
+                        <p class="text-xs text-gray-600 mt-0.5">Tu pedido está respaldado desde el envío hasta tu puerta.</p>
+                    </div>
+                </div>
+
+                <!-- Beneficio 3 -->
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-200/80 flex items-center gap-3.5 hover:shadow-md transition-shadow">
+                    <div class="w-11 h-11 rounded-full bg-[#edf7ed] text-[#067d62] flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-[#0f1111]">Devoluciones fáciles</h2>
+                        <p class="text-xs text-gray-600 mt-0.5">Hasta 30 días para devolver productos sin costo adicional.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CONTENIDO PRINCIPAL: CATÁLOGO DE PRODUCTOS ==================== -->
+    <main id="catalogSection" class="flex-1 max-w-[1500px] w-full mx-auto px-3 sm:px-6 -mt-4 pb-12">
+
+        <!-- Barra de Controles: Resultados, Filtros Activos y Ordenamiento -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
+                <p id="resultsSummary" class="text-sm text-[#0f1111]">
+                    Mostrando <span class="font-bold">12</span> productos en <span class="font-bold text-[#c45500]">Todo</span>
+                </p>
+                <button
+                    id="resetFiltersBtn"
+                    type="button"
+                    onclick="resetAllFilters()"
+                    class="hidden text-xs font-semibold text-[#007185] hover:text-[#c7511f] hover:underline bg-[#f0f2f2] px-2.5 py-1 rounded-full transition-colors"
+                >
+                    Limpiar filtros ✕
+                </button>
+            </div>
+
+            <!-- Selector de ordenamiento -->
+            <div class="flex items-center gap-2 self-start sm:self-auto">
+                <label for="sortSelect" class="text-xs sm:text-sm font-medium text-gray-600 whitespace-nowrap">Ordenar por:</label>
+                <select
+                    id="sortSelect"
+                    onchange="handleSortChange(this.value)"
+                    class="bg-[#f0f2f2] hover:bg-[#e3e6e6] border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm font-medium text-[#0f1111] focus:outline-none focus:ring-2 focus:ring-[#007185] cursor-pointer"
+                >
+                    <option value="featured">Destacados</option>
+                    <option value="price-asc">Precio: menor a mayor</option>
+                    <option value="price-desc">Precio: mayor a menor</option>
+                    <option value="rating-desc">Mejor calificados</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Cuadrícula de Productos -->
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <!-- Las tarjetas de producto se inyectan dinámicamente vía JavaScript -->
+        </div>
+
+        <!-- Estado Vacío cuando la búsqueda no encuentra resultados -->
+        <div id="emptyResultsState" class="hidden bg-white rounded-2xl shadow-sm border border-gray-200 p-10 text-center max-w-lg mx-auto my-8">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-bold text-[#0f1111] mb-1">No encontramos coincidencias</h3>
+            <p class="text-sm text-gray-600 mb-5">
+                Intenta con otro término de búsqueda o explora todas las categorías disponibles.
+            </p>
+            <button
+                type="button"
+                onclick="resetAllFilters()"
+                class="bg-[#ffd814] hover:bg-[#f7ca00] text-[#0f1111] font-semibold text-sm px-5 py-2.5 rounded-full shadow-sm transition-colors"
+            >
+                Mostrar todos los productos
+            </button>
+        </div>
+    </main>
+
+    <!-- ==================== PIE DE PÁGINA CLÁSICO DE AMAZON ==================== -->
+    <footer class="mt-auto text-white">
+        <!-- Botón "Inicio de página" -->
+        <button
+            type="button"
+            onclick="scrollToTop()"
+            class="w-full bg-[#37475a] hover:bg-[#485769] text-white text-sm font-medium py-3.5 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#febd69]"
+        >
+            Inicio de página
+        </button>
+
+        <!-- Columnas de información institucional -->
+        <div class="bg-[#232f3e] border-b border-gray-700">
+            <div class="max-w-[1100px] mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+                <div>
+                    <h3 class="font-bold text-white mb-3">Conócenos</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm text-gray-300">
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Trabajar en Amazon</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Información corporativa</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Departamento de prensa</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Sustentabilidad</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white mb-3">Gana dinero con nosotros</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm text-gray-300">
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Vender en Amazon</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Programa de Afiliados</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Anuncia tus productos</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Publica tu libro</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white mb-3">Productos de Pago</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm text-gray-300">
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Tarjetas de regalo</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Meses sin intereses</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Pago en efectivo</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Amazon Recargable</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white mb-3">Podemos ayudarte</h3>
+                    <ul class="space-y-2 text-xs sm:text-sm text-gray-300">
+                        <li><button type="button" onclick="openOrdersModal()" class="hover:underline text-left">Tus pedidos</button></li>
+                        <li><button type="button" onclick="toggleCartDrawer(true)" class="hover:underline text-left">Tu carrito</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Devoluciones y reemplazos</button></li>
+                        <li><button type="button" onclick="openInfoModal('demo')" class="hover:underline text-left">Ayuda y soporte</button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Franja inferior con logotipo y aviso educativo -->
+        <div class="bg-[#131921] py-7 px-4 text-center">
+            <div class="max-w-[1000px] mx-auto flex flex-col items-center gap-3">
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <div class="flex flex-col items-center">
+                        <span class="text-xl font-extrabold tracking-tight text-white leading-none">amazon</span>
+                        <svg class="w-14 h-2.5 text-[#ff9900]" viewBox="0 0 110 18" fill="none" aria-hidden="true">
+                            <path d="M5 4C32 16 74 16 99 5" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+                            <path d="M92 2.5L102 4.5L97 13" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs border border-gray-600 rounded px-3 py-1 text-gray-300">🇲🇽 México · $ MXN</span>
+                </div>
+                <p class="text-xs text-gray-400 max-w-2xl leading-relaxed">
+                    Proyecto demo educativo de comercio electrónico desarrollado en HTML, Tailwind CSS y JavaScript puro para despliegue en GitHub Pages. No está afiliado a Amazon.com, Inc. ni procesa pagos reales.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== PANEL LATERAL DESLIZABLE DEL CARRITO (DRAWER) ==================== -->
+    <!-- Fondo oscuro del carrito -->
+    <div
+        id="cartBackdrop"
+        onclick="toggleCartDrawer(false)"
+        class="fixed inset-0 bg-black/60 backdrop-blur-[1px] z-50 hidden opacity-0 transition-opacity duration-300"
+        aria-hidden="true"
+    ></div>
+
+    <!-- Panel deslizante derecho -->
+    <aside
+        id="cartDrawer"
+        aria-label="Carrito de compras"
+        aria-hidden="true"
+        class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 ease-out flex flex-col"
+    >
+        <!-- Encabezado del Carrito -->
+        <div class="bg-[#131921] text-white px-5 py-4 flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-2.5">
+                <svg class="w-6 h-6 text-[#ff9900]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <h2 class="text-lg font-bold">Tu Carrito <span id="drawerItemCount" class="text-sm font-normal text-gray-300">(0)</span></h2>
+            </div>
+            <button
+                type="button"
+                onclick="toggleCartDrawer(false)"
+                aria-label="Cerrar carrito"
+                class="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Barra de Envío Gratis -->
+        <div id="freeShippingBanner" class="hidden bg-[#edf7ed] border-b border-green-200 px-5 py-3 flex items-center gap-2.5 shrink-0">
+            <span class="w-5 h-5 rounded-full bg-[#067d62] text-white flex items-center justify-center shrink-0">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+            </span>
+            <p class="text-xs sm:text-sm text-[#067d62] font-medium">
+                <strong>¡Envío GRATIS disponible!</strong> Tu pedido califica para entrega rápida Prime.
+            </p>
+        </div>
+
+        <!-- Lista de Productos en el Carrito -->
+        <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-[#f7f8f8]">
+            <!-- Renderizado dinámico de artículos o estado vacío -->
+        </div>
+
+        <!-- Pie del Carrito: Subtotal y Botón Proceder al Pago -->
+        <div id="cartFooter" class="hidden bg-white border-t border-gray-200 p-5 space-y-3.5 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] shrink-0">
+            <div class="space-y-1">
+                <div class="flex items-center justify-between text-sm text-gray-600">
+                    <span>Envío estimado</span>
+                    <span class="text-[#067d62] font-bold">GRATIS</span>
+                </div>
+                <div class="flex items-baseline justify-between text-base sm:text-lg font-bold text-[#0f1111]">
+                    <span id="cartSubtotalLabel">Subtotal (0 artículos):</span>
+                    <span id="cartSubtotalAmount" class="text-xl text-[#b12704]">$0.00</span>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                onclick="processCheckout()"
+                class="w-full bg-[#ffd814] hover:bg-[#f7ca00] active:bg-[#f0b800] border border-[#fcd200] text-[#0f1111] font-bold text-sm sm:text-base py-3 rounded-full shadow-sm transition-colors"
+            >
+                Proceder al pago
+            </button>
+
+            <button
+                type="button"
+                onclick="clearCart()"
+                class="w-full text-xs font-medium text-gray-500 hover:text-[#cc0c39] py-1 transition-colors"
+            >
+                Vaciar carrito
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== MODAL DE CONFIRMACIÓN DE PEDIDO (CHECKOUT SIMULADO) ==================== -->
+    <div
+        id="checkoutModal"
+        class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-[1px]"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="checkoutModalTitle"
+    >
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 relative">
+            <button
+                type="button"
+                onclick="closeModal('checkoutModal')"
+                aria-label="Cerrar confirmación"
+                class="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-700 rounded-full hover:bg-gray-100"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <div class="text-center">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[#edf7ed] text-[#067d62] flex items-center justify-center">
+                    <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <h2 id="checkoutModalTitle" class="text-xl font-extrabold text-[#0f1111]">¡Pedido confirmado con éxito!</h2>
+                <p class="text-sm text-gray-600 mt-1">
+                    Gracias por tu compra simulada. No se realizó ningún cargo real.
+                </p>
+            </div>
+
+            <div id="checkoutOrderDetails" class="mt-5 bg-[#f7f8f8] rounded-xl p-4 border border-gray-200 text-sm space-y-2">
+                <!-- Detalles inyectados por JS -->
+            </div>
+
+            <div class="mt-6 flex flex-col sm:flex-row gap-2.5">
+                <button
+                    type="button"
+                    onclick="closeModal('checkoutModal')"
+                    class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] text-[#0f1111] font-bold text-sm py-2.5 rounded-full shadow-sm transition-colors"
+                >
+                    Seguir comprando
+                </button>
+                <button
+                    type="button"
+                    onclick="closeModal('checkoutModal'); openOrdersModal();"
+                    class="flex-1 bg-[#f0f2f2] hover:bg-[#e3e6e6] text-[#0f1111] font-semibold text-sm py-2.5 rounded-full transition-colors"
+                >
+                    Ver mis pedidos
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DE VISTA RÁPIDA DE PRODUCTO ==================== -->
+    <div
+        id="productQuickViewModal"
+        class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-[1px]"
+        role="dialog"
+        aria-modal="true"
+    >
+        <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl border border-gray-200 relative max-h-[90vh] flex flex-col">
+            <button
+                type="button"
+                onclick="closeModal('productQuickViewModal')"
+                aria-label="Cerrar vista rápida"
+                class="absolute top-3 right-3 z-10 p-2 bg-white/90 text-gray-600 hover:text-black rounded-full shadow hover:bg-gray-100"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <div id="quickViewContent" class="overflow-y-auto p-5 sm:p-6">
+                <!-- Contenido inyectado dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DE SELECTOR DE UBICACIÓN ==================== -->
+    <div
+        id="locationModal"
+        class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-[1px]"
+        role="dialog"
+        aria-modal="true"
+    >
+        <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl border border-gray-200">
+            <div class="bg-[#f0f2f2] px-5 py-3.5 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="font-bold text-sm text-[#0f1111]">Elige tu ubicación de entrega</h3>
+                <button type="button" onclick="closeModal('locationModal')" class="text-gray-500 hover:text-black p-1">✕</button>
+            </div>
+            <div class="p-5 space-y-3">
+                <p class="text-xs text-gray-600">Las opciones de entrega Prime y tiempos estimados se ajustan a tu ciudad en México.</p>
+                <div class="grid grid-cols-1 gap-2">
+                    <button type="button" onclick="setLocation('México')" class="text-left px-3.5 py-2.5 rounded-lg border border-gray-200 hover:border-[#007185] hover:bg-[#f0f8fa] text-sm font-medium transition-colors">🇲🇽 Todo México (Predeterminado)</button>
+                    <button type="button" onclick="setLocation('Ciudad de México')" class="text-left px-3.5 py-2.5 rounded-lg border border-gray-200 hover:border-[#007185] hover:bg-[#f0f8fa] text-sm font-medium transition-colors">📍 Ciudad de México, CDMX</button>
+                    <button type="button" onclick="setLocation('León, Gto.')" class="text-left px-3.5 py-2.5 rounded-lg border border-gray-200 hover:border-[#007185] hover:bg-[#f0f8fa] text-sm font-medium transition-colors">📍 León, Guanajuato</button>
+                    <button type="button" onclick="setLocation('Guadalajara, Jal.')" class="text-left px-3.5 py-2.5 rounded-lg border border-gray-200 hover:border-[#007185] hover:bg-[#f0f8fa] text-sm font-medium transition-colors">📍 Guadalajara, Jalisco</button>
+                    <button type="button" onclick="setLocation('Monterrey, N.L.')" class="text-left px-3.5 py-2.5 rounded-lg border border-gray-200 hover:border-[#007185] hover:bg-[#f0f8fa] text-sm font-medium transition-colors">📍 Monterrey, Nuevo León</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DE HISTORIAL DE PEDIDOS SIMULADOS ==================== -->
+    <div
+        id="ordersModal"
+        class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-[1px]"
+        role="dialog"
+        aria-modal="true"
+    >
+        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-gray-200 max-h-[85vh] flex flex-col">
+            <div class="bg-[#131921] text-white px-5 py-4 flex items-center justify-between">
+                <h3 class="font-bold text-base">Mis Pedidos (Demo)</h3>
+                <button type="button" onclick="closeModal('ordersModal')" class="text-gray-300 hover:text-white p-1">✕</button>
+            </div>
+            <div id="ordersListContainer" class="p-5 overflow-y-auto space-y-3 bg-[#f7f8f8] flex-1">
+                <!-- Historial de pedidos simulados -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL INFORMATIVO (CUENTA / ENLACES DEMO) ==================== -->
+    <div
+        id="infoModal"
+        class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-[1px]"
+        role="dialog"
+        aria-modal="true"
+    >
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-200 text-center space-y-3">
+            <div class="w-12 h-12 mx-auto rounded-full bg-[#fef3e6] text-[#c45500] flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <h3 id="infoModalTitle" class="text-lg font-bold text-[#0f1111]">Modo Demo Educativo</h3>
+            <p id="infoModalBody" class="text-sm text-gray-600 leading-relaxed">
+                Esta sección es decorativa en la versión de demostración. Puedes explorar el catálogo, filtrar, buscar y probar el carrito completo sin iniciar sesión.
+            </p>
+            <button
+                type="button"
+                onclick="closeModal('infoModal')"
+                class="w-full bg-[#ffd814] hover:bg-[#f7ca00] text-[#0f1111] font-bold text-sm py-2.5 rounded-full transition-colors mt-2"
+            >
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== CONTENEDOR DE NOTIFICACIÓN TOAST ==================== -->
+    <div
+        id="toastContainer"
+        aria-live="polite"
+        class="fixed bottom-4 right-4 left-4 sm:left-auto z-50 flex flex-col items-end gap-2 pointer-events-none"
+    ></div>
+
+    <!-- ==================== LÓGICA JAVASCRIPT AUTOCONTENIDA ==================== -->
+    <script>
+        /**
+         * ============================================================================
+         * 1. CATÁLOGO DE PRODUCTOS (12 artículos variados en 4 categorías)
+         * ============================================================================
+         * Cada producto incluye una URL de fotografía confiable y un `svgType` que
+         * actúa como ilustración SVG estilizada de respaldo (fallback) ante cualquier
+         * fallo de red, garantizando que jamás se muestren imágenes rotas.
+         */
+        const PRODUCTS = [
+            {
+                id: 'elec-01',
+                title: 'Audífonos Inalámbricos Sony WH-1000XM5 con Cancelación Activa de Ruido y 30h de Batería',
+                category: 'Electrónica',
+                price: 6499.00,
+                oldPrice: 7999.00,
+                rating: 4.9,
+                reviews: 2841,
+                badge: 'Más vendido',
+                isDeal: true,
+                prime: true,
+                deliveryText: 'Entrega GRATIS mañana',
+                image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
+                svgType: 'headphones',
+                description: 'Sonido de alta resolución con 8 micrófonos para cancelación de ruido líder en la industria, conexión multipunto Bluetooth 5.2 y estuche rígido de viaje.'
+            },
+            {
+                id: 'elec-02',
+                title: 'Smartwatch Deportivo GTR 4 con GPS Doble Banda, Pantalla AMOLED y Alexa Integrada',
+                category: 'Electrónica',
+                price: 3299.50,
+                oldPrice: 4199.00,
+                rating: 4.7,
+                reviews: 1320,
+                badge: 'Oferta del día',
+                isDeal: true,
+                prime: true,
+                deliveryText: 'Entrega GRATIS mañana',
+                image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80',
+                svgType: 'watch',
+                description: 'Monitoreo 24/7 de frecuencia cardiaca, oxígeno en sangre y sueño. Más de 150 modos deportivos y batería de hasta 14 días.'
+            },
+            {
+                id: 'elec-03',
+                title: 'Bocina Inteligente Echo Dot (5ta Generación) con Alexa y Audio Mejorado - Carbón',
+                category: 'Electrónica',
+                price: 999.00,
+                oldPrice: 1299.00,
+                rating: 4.8,
+                reviews: 15420,
+                badge: 'Más vendido',
+                isDeal: true,
+                prime: true,
+                deliveryText: 'Entrega GRATIS hoy',
+                image: 'https://images.unsplash.com/photo-1543512214-318c7553f230?auto=format&fit=crop&w=600&q=80',
+                svgType: 'speaker',
+                description: 'Voces más nítidas y graves más profundos. Controla luces, música, alarmas y dispositivos de casa inteligente con tu voz.'
+            },
+            {
+                id: 'home-01',
+                title: 'Cafetera Espresso Automática PrimaLatte de Acero Inoxidable 19 Bares con Espumador',
+                category: 'Hogar',
+                price: 4599.00,
+                oldPrice: 5499.00,
+                rating: 4.7,
+                reviews: 3190,
+                badge: 'Oferta del día',
+                isDeal: true,
+                prime: true,
+                deliveryText: 'Entrega GRATIS mañana',
+                image: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?auto=format&fit=crop&w=600&q=80',
+                svgType: 'coffee',
+                description: 'Prepara espressos, cappuccinos y lattes con un solo toque. Compatible con café molido y cápsulas, depósito removible de leche.'
+            },
+            {
+                id: 'home-02',
+                title: 'Freidora de Aire Digital Ninja 5.2 Litros con 4 Funciones de Cocción y Canasta Antiadherente',
+                category: 'Hogar',
+                price: 2449.00,
+                oldPrice: 2999.00,
+                rating: 4.9,
+                reviews: 8765,
+                badge: 'Más vendido',
+                isDeal: true,
+                prime: true,
+                deliveryText: 'Entrega GRATIS mañana',
+                image: 'https://images.unsplash.com/photo-1585515320310-259814833e62?auto=format&fit=crop&w=600&q=80',
+                svgType: 'appliance',
+                description: 'Cocina hasta con 75% menos grasa que los métodos tradicionales. Incluye funciones para freír con aire, asar, recalentar y deshidratar.'
+            },
+            {
+                id: 'home-03',
+                title: 'Lámpara de Escritorio LED Minimalista Regulable con Base de Carga Inalámbrica USB',
+                category: 'Hogar',
+                price: 689.90,
+                oldPrice: null,
+                rating: 4.5,
+                reviews: 542,
+                badge: null,
+                isDeal: false,
+                prime: true,
+                deliveryText: 'Entrega GRATIS en 2 días',
+                image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=600&q=80',
+                svgType: 'lamp',
+                description: 'Iluminación sin parpadeos que cuida la vista, 5 temperaturas de color, control táctil y brazo plegable de aluminio.'
+            },
+            {
+                id: 'book-01',
+                title: 'Hábitos Atómicos: Cambios pequeños, resultados extraordinarios - James Clear (Tapa Blanda)',
+                category: 'Libros',
+                price: 349.00,
+                oldPrice: 429.00,
+                rating: 4.9,
+                reviews: 24180,
+                badge: 'Más vendido',
+                isDeal: true,
+                prime: true,
+                deliveryText: 'Entrega GRATIS mañana',
+                image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80',
+                svgType: 'book',
+                description: 'Un método sencillo y comprobado para desarrollar buenos hábitos y eliminar los malos mediante mejoras diarias del 1%.'
+            },
+            {
+                id: 'book-02',
+                title: 'La Psicología del Dinero: Cómo piensan los ricos - Morgan Housel (Edición en Español)',
+                category: 'Libros',
+                price: 315.00,
+                oldPrice: null,
+                rating: 4.8,
+                reviews: 9412,
+                badge: null,
+                isDeal: false,
+                prime: true,
+                deliveryText: 'Entrega GRATIS mañana',
+                image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80',
+                svgType: 'book',
+                description: '18 claves atemporales sobre la riqueza, la ambición y la felicidad explicadas a través de historias claras y prácticas.'
+            },
+            {
+                id: 'book-03',
+                title: 'Código Limpio (Clean Code): Manual de estilo para el desarrollo ágil de software',
+                category: 'Libros',
+                price: 895.50,
+                oldPrice: 1050.00,
+                rating: 4.7,
+                reviews: 4210,
+                badge: 'Oferta del día',
+                isDeal: true,
+                prime: true,
+                deliveryText: 'Entrega GRATIS en 2 días',
+                image: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=600&q=80',
+                svgType: 'book',
+                description: 'Referencia esencial para desarrolladores que buscan escribir código legible, mantenible y profesional en cualquier lenguaje.'
+            },
+            {
+                id: 'fash-01',
+                title: 'Tenis Deportivos Urbanos Runner Pro con Suela Ultraligera y Malla Transpirable Unisex',
+                category: 'Moda',
+                price: 1499.00,
+                oldPrice: 1899.00,
+                rating: 4.6,
+                reviews: 1890,
+                badge: 'Oferta del día',
+                isDeal: true,
+                prime: true,
+                deliveryText: 'Entrega GRATIS mañana',
+                image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
+                svgType: 'sneaker',
+                description: 'Amortiguación reactiva de espuma EVA para caminatas largas o entrenamiento diario. Ajuste cómodo y diseño contemporáneo.'
+            },
+            {
+                id: 'fash-02',
+                title: 'Mochila Ejecutiva Impermeable para Laptop de 15.6" con Puerto USB y Bolsillo Antirrobo',
+                category: 'Moda',
+                price: 749.00,
+                oldPrice: 999.00,
+                rating: 4.8,
+                reviews: 6120,
+                badge: 'Más vendido',
+                isDeal: true,
+                prime: true,
+                deliveryText: 'Entrega GRATIS mañana',
+                image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80',
+                svgType: 'backpack',
+                description: 'Tejido resistente al agua, compartimento acolchado para portátil y correa trasera para sujetar fácilmente en maletas de viaje.'
+            },
+            {
+                id: 'fash-03',
+                title: 'Chamarra Casual Rompevientos Ligera de Entretiempo con Bolsillos con Cierre',
+                category: 'Moda',
+                price: 1190.00,
+                oldPrice: null,
+                rating: 4.5,
+                reviews: 730,
+                badge: null,
+                isDeal: false,
+                prime: true,
+                deliveryText: 'Entrega GRATIS en 2 días',
+                image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=600&q=80',
+                svgType: 'jacket',
+                description: 'Corte moderno, forro suave transpirable y protección contra viento ligero. Ideal para oficina o uso diario en ciudad.'
+            }
+        ];
+
+        const CATEGORIES = ['Todo', 'Ofertas del Día', 'Electrónica', 'Hogar', 'Libros', 'Moda'];
+        const STORAGE_KEYS = {
+            CART: 'amazon_mx_demo_cart_v1',
+            ORDERS: 'amazon_mx_demo_orders_v1',
+            LOCATION: 'amazon_mx_demo_location_v1'
+        };
+
+        /**
+         * ============================================================================
+         * 2. ESTADO GLOBAL DE LA APLICACIÓN
+         * ============================================================================
+         */
+        let state = {
+            activeCategory: 'Todo',
+            searchQuery: '',
+            sortBy: 'featured',
+            cart: [],      // Array de { id, qty }
+            orders: [],    // Historial de pedidos simulados
+            location: 'México'
+        };
+
+        /**
+         * ============================================================================
+         * 3. UTILIDADES DE PERSISTENCIA (localStorage con manejo seguro try/catch)
+         * ============================================================================
+         */
+        function loadFromStorage() {
+            try {
+                const savedCart = localStorage.getItem(STORAGE_KEYS.CART);
+                if (savedCart) {
+                    const parsed = JSON.parse(savedCart);
+                    if (Array.isArray(parsed)) {
+                        // Validar que cada ítem exista aún en el catálogo
+                        state.cart = parsed.filter(item =>
+                            PRODUCTS.some(p => p.id === item.id) && Number(item.qty) > 0
+                        );
+                    }
+                }
+                const savedOrders = localStorage.getItem(STORAGE_KEYS.ORDERS);
+                if (savedOrders) {
+                    const parsedOrders = JSON.parse(savedOrders);
+                    if (Array.isArray(parsedOrders)) state.orders = parsedOrders;
+                }
+                const savedLocation = localStorage.getItem(STORAGE_KEYS.LOCATION);
+                if (savedLocation) state.location = savedLocation;
+            } catch (err) {
+                console.warn('No se pudo leer localStorage:', err);
+            }
+        }
+
+        function saveCartToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(state.cart));
+            } catch (err) {
+                console.warn('No se pudo guardar el carrito en localStorage:', err);
+            }
+        }
+
+        function saveOrdersToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(state.orders));
+            } catch (err) {
+                console.warn('No se pudo guardar el historial de pedidos:', err);
+            }
+        }
+
+        function saveLocationToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEYS.LOCATION, state.location);
+            } catch (err) {
+                console.warn('No se pudo guardar la ubicación:', err);
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 4. GENERADORES VISUALES: FALLBACK SVG, ESTRELLAS Y FORMATO DE PRECIO
+         * ============================================================================
+         */
+
+        // Ilustraciones SVG estilizadas de respaldo para garantizar 0 imágenes rotas
+        function getFallbackSvg(type) {
+            const svgs = {
+                headphones: `<svg class="w-24 h-24 text-[#232f3e]" viewBox="0 0 64 64" fill="none">
+                    <rect width="64" height="64" rx="14" fill="#eef2f6"/>
+                    <path d="M16 34V30C16 21.163 23.163 14 32 14C40.837 14 48 21.163 48 30V34" stroke="#232f3e" stroke-width="4" stroke-linecap="round"/>
+                    <rect x="12" y="32" width="10" height="18" rx="5" fill="#ff9900" stroke="#232f3e" stroke-width="2.5"/>
+                    <rect x="42" y="32" width="10" height="18" rx="5" fill="#ff9900" stroke="#232f3e" stroke-width="2.5"/>
+                </svg>`,
+                watch: `<svg class="w-24 h-24" viewBox="0 0 64 64" fill="none">
+                    <rect width="64" height="64" rx="14" fill="#eef6f9"/>
+                    <rect x="24" y="8" width="16" height="48" rx="4" fill="#37475a"/>
+                    <rect x="18" y="18" width="28" height="28" rx="8" fill="#131921" stroke="#00a8e1" stroke-width="2.5"/>
+                    <path d="M32 25V32L37 35" stroke="#febd69" stroke-width="2.8" stroke-linecap="round"/>
+                </svg>`,
+                speaker: `<svg class="w-24 h-24" viewBox="0 0 64 64" fill="none">
+                    <rect width="64" height="64" rx="14" fill="#eef2f6"/>
+                    <circle cx="32" cy="34" r="18" fill="#232f3e"/>
+                    <ellipse cx="32" cy="22" rx="14" ry="4" fill="#00a8e1"/>
+                    <circle cx="32" cy="35" r="3" fill="#febd69"/>
+                </svg>`,
+                coffee: `<svg class="w-24 h-24" viewBox="0 0 64 64" fill="none">
+                    <rect width="64" height="64" rx="14" fill="#fdf4ea"/>
+                    <rect x="16" y="14" width="32" height="36" rx="5" fill="#37475a"/>
+                    <rect x="22" y="20" width="20" height="8" rx="2" fill="#febd69"/>
+                    <path d="M24 34H40V42C40 45.314 37.314 48 34 48H30C26.686 48 24 45.314 24 42V34Z" fill="#ffffff"/>
+                </svg>`,
+                appliance: `<svg class="w-24 h-24" viewBox="0 0 64 64" fill="none">
+                    <rect width="64" height="64" rx="14" fill="#f3f4f6"/>
+                    <rect x="18" y="12" width="28" height="40" rx="8" fill="#232f3e"/>
+                    <rect x="24" y="18" width="16" height="8" rx="2" fill="#00a8e1"/>
+                    <rect x="22" y="34" width="20" height="12" rx="3" fill="#febd69"/>
+                </svg>`,
+                lamp: `<svg class="w-24 h-24" viewBox="0 0 64 64" fill="none">
+                    <rect width="64" height="64" rx="14" fill="#fefce8"/>
+                    <path d="M20 48H44" stroke="#232f3e" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M32 48V28L42 18" stroke="#37475a" stroke-width="3.5" stroke-linecap="round"/>
+                    <path d="M36 14L48 24L38 28L32 20L36 14Z" fill="#ff9900"/>
+                </svg>`,
+                book: `<svg class="w-24 h-24" viewBox="0 0 64 64" fill="none">
+                    <rect width="64" height="64" rx="14" fill="#fef3e6"/>
+                    <rect x="16" y="12" width="32" height="40" rx="4" fill="#232f3e"/>
+                    <rect x="20" y="12" width="4" height="40" fill="#ff9900"/>
+                    <path d="M28 24H42M28 31H40M28 38H36" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>`,
+                sneaker: `<svg class="w-24 h-24" viewBox="0 0 64 64" fill="none">
+                    <rect width="64" height="64" rx="14" fill="#fef2f2"/>
+                    <path d="M12 40C12 34 18 28 24 24L32 30H48C51.314 30 54 32.686 54 36V42H12V40Z" fill="#cc0c39"/>
+                    <rect x="12" y="42" width="42" height="5" rx="2.5" fill="#232f3e"/>
+                </svg>`,
+                backpack: `<svg class="w-24 h-24" viewBox="0 0 64 64" fill="none">
+                    <rect width="64" height="64" rx="14" fill="#eef2f6"/>
+                    <path d="M25 18V15C25 12.239 27.239 10 30 10H34C36.761 10 39 12.239 39 15V18" stroke="#232f3e" stroke-width="3"/>
+                    <rect x="17" y="18" width="30" height="34" rx="8" fill="#232f3e"/>
+                    <rect x="23" y="32" width="18" height="14" rx="4" fill="#febd69"/>
+                </svg>`,
+                jacket: `<svg class="w-24 h-24" viewBox="0 0 64 64" fill="none">
+                    <rect width="64" height="64" rx="14" fill="#eff6ff"/>
+                    <path d="M22 14L12 24L18 30L22 26V50H42V26L46 30L52 24L42 14H36L32 20L28 14H22Z" fill="#37475a"/>
+                    <path d="M32 20V50" stroke="#febd69" stroke-width="2.5"/>
+                </svg>`
+            };
+            return svgs[type] || svgs.box || svgs.headphones;
+        }
+
+        // Genera estrellas doradas con precisión visual
+        function renderStars(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalf = rating - fullStars >= 0.4;
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= fullStars) {
+                    html += `<svg class="w-4 h-4 text-[#ffa41c] fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.173c.969 0 1.371 1.24.588 1.81l-3.376 2.453a1 1 0 00-.364 1.118l1.286 3.966c.3.922-.755 1.688-1.54 1.118l-3.376-2.453a1 1 0 00-1.175 0l-3.376 2.453c-.784.57-1.838-.196-1.539-1.118l1.285-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.173a1 1 0 00.95-.69l1.288-3.967z"/></svg>`;
+                } else if (i === fullStars + 1 && hasHalf) {
+                    html += `<svg class="w-4 h-4 text-[#ffa41c]" viewBox="0 0 20 20">
+                        <defs><linearGradient id="halfGrad-${i}"><stop offset="50%" stop-color="#ffa41c"/><stop offset="50%" stop-color="#e5e7eb"/></linearGradient></defs>
+                        <path fill="url(#halfGrad-${i})" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.173c.969 0 1.371 1.24.588 1.81l-3.376 2.453a1 1 0 00-.364 1.118l1.286 3.966c.3.922-.755 1.688-1.54 1.118l-3.376-2.453a1 1 0 00-1.175 0l-3.376 2.453c-.784.57-1.838-.196-1.539-1.118l1.285-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.173a1 1 0 00.95-.69l1.288-3.967z"/>
+                    </svg>`;
+                } else {
+                    html += `<svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.173c.969 0 1.371 1.24.588 1.81l-3.376 2.453a1 1 0 00-.364 1.118l1.286 3.966c.3.922-.755 1.688-1.54 1.118l-3.376-2.453a1 1 0 00-1.175 0l-3.376 2.453c-.784.57-1.838-.196-1.539-1.118l1.285-3.966a1 1 0 00-.364-1.118L2.05 9.394c-.783-.57-.38-1.81.588-1.81h4.173a1 1 0 00.95-.69l1.288-3.967z"/></svg>`;
+                }
+            }
+            return html;
+        }
+
+        // Formatea precio estilo Amazon: signo $ y centavos en superíndice
+        function formatAmazonPriceHTML(amount) {
+            const fixed = Number(amount).toFixed(2);
+            const [wholeRaw, cents] = fixed.split('.');
+            const wholeFormatted = Number(wholeRaw).toLocaleString('es-MX');
+            return `
+                <span class="inline-flex items-start font-bold text-[#0f1111] leading-none">
+                    <span class="text-xs font-semibold mt-0.5 mr-0.5">$</span>
+                    <span class="text-2xl tracking-tight">${wholeFormatted}</span>
+                    <span class="text-xs font-semibold mt-0.5 ml-0.5">${cents}</span>
+                    <span class="text-[11px] font-medium text-gray-500 self-end ml-1 mb-0.5">MXN</span>
+                </span>
+            `;
+        }
+
+        // Formato estándar de moneda MXN para totales y precios tachados
+        function formatCurrency(amount) {
+            return '$' + Number(amount).toLocaleString('es-MX', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        // Calcula el porcentaje de descuento si existe precio anterior
+        function getDiscountPercent(price, oldPrice) {
+            if (!oldPrice || oldPrice <= price) return 0;
+            return Math.round(((oldPrice - price) / oldPrice) * 100);
+        }
+
+        /**
+         * ============================================================================
+         * 5. RENDERIZADO DE NAVEGACIÓN Y CATÁLOGO FILTRADO/ORDENADO
+         * ============================================================================
+         */
+        function renderCategoryNav() {
+            const container = document.getElementById('categoryNavButtons');
+            container.innerHTML = CATEGORIES.map(cat => {
+                const isActive = state.activeCategory === cat;
+                const activeClasses = isActive
+                    ? 'bg-[#febd69] text-[#131921] font-bold border-[#febd69]'
+                    : 'text-gray-100 hover:border-white border-transparent font-medium';
+                const icon = cat === 'Ofertas del Día'
+                    ? '<span class="mr-1 text-xs">🔥</span>'
+                    : (cat === 'Todo' ? '<span class="mr-1 text-xs">☰</span>' : '');
+
+                return `
+                    <button
+                        type="button"
+                        onclick="selectCategory('${cat}')"
+                        class="px-3 py-1.5 rounded text-xs sm:text-sm whitespace-nowrap border transition-colors ${activeClasses}"
+                    >
+                        ${icon}${cat}
+                    </button>
+                `;
+            }).join('');
+
+            // Sincronizar también el <select> de la barra de búsqueda
+            const searchSelect = document.getElementById('searchCategorySelect');
+            if (searchSelect) searchSelect.value = state.activeCategory;
+        }
+
+        function getFilteredProducts() {
+            const query = state.searchQuery.trim().toLowerCase();
+
+            let filtered = PRODUCTS.filter(product => {
+                // Filtro por categoría
+                let matchesCategory = true;
+                if (state.activeCategory === 'Ofertas del Día') {
+                    matchesCategory = product.isDeal;
+                } else if (state.activeCategory !== 'Todo') {
+                    matchesCategory = product.category === state.activeCategory;
+                }
+
+                // Filtro por texto en tiempo real (título, categoría o descripción)
+                const matchesQuery = !query ||
+                    product.title.toLowerCase().includes(query) ||
+                    product.category.toLowerCase().includes(query) ||
+                    product.description.toLowerCase().includes(query);
+
+                return matchesCategory && matchesQuery;
+            });
+
+            // Ordenamiento
+            if (state.sortBy === 'price-asc') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (state.sortBy === 'price-desc') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (state.sortBy === 'rating-desc') {
+                filtered.sort((a, b) => b.rating - a.rating || b.reviews - a.reviews);
+            }
+
+            return filtered;
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const emptyState = document.getElementById('emptyResultsState');
+            const summaryEl = document.getElementById('resultsSummary');
+            const resetBtn = document.getElementById('resetFiltersBtn');
+
+            const items = getFilteredProducts();
+            const hasActiveFilter = state.activeCategory !== 'Todo' || state.searchQuery.trim() !== '' || state.sortBy !== 'featured';
+
+            // Actualizar resumen de resultados
+            const queryPart = state.searchQuery.trim()
+                ? ` para <span class="font-bold text-[#c45500]">"${escapeHtml(state.searchQuery.trim())}"</span>`
+                : '';
+            summaryEl.innerHTML = `Mostrando <span class="font-bold">${items.length}</span> ${items.length === 1 ? 'producto' : 'productos'} en <span class="font-bold text-[#007185]">${state.activeCategory}</span>${queryPart}`;
+
+            resetBtn.classList.toggle('hidden', !hasActiveFilter);
+
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            grid.innerHTML = items.map(product => {
+                const discount = getDiscountPercent(product.price, product.oldPrice);
+                const badgeClass = product.badge === 'Más vendido'
+                    ? 'bg-[#c45500] text-white'
+                    : 'bg-[#cc0c39] text-white';
+
+                return `
+                    <article class="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col overflow-hidden relative">
+                        <!-- Etiqueta superior opcional (Más vendido / Oferta del día) -->
+                        ${product.badge ? `
+                            <span class="absolute top-3 left-3 z-10 ${badgeClass} text-[11px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-md shadow-sm">
+                                ${product.badge}
+                            </span>
+                        ` : ''}
+
+                        <!-- Imagen del producto con fallback SVG estilizado -->
+                        <button
+                            type="button"
+                            onclick="openQuickView('${product.id}')"
+                            aria-label="Ver detalles de ${escapeHtml(product.title)}"
+                            class="relative w-full h-52 bg-[#f7f8f8] overflow-hidden flex items-center justify-center p-3 focus:outline-none"
+                        >
+                            <img
+                                src="${product.image}"
+                                alt="${escapeHtml(product.title)}"
+                                loading="lazy"
+                                class="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                                onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+                            />
+                            <div class="hidden w-full h-full flex flex-col items-center justify-center gap-2 bg-white rounded-lg border border-gray-100">
+                                ${getFallbackSvg(product.svgType)}
+                                <span class="text-[11px] font-semibold text-gray-500">${product.category}</span>
+                            </div>
+                        </button>
+
+                        <!-- Cuerpo de la Tarjeta -->
+                        <div class="p-4 flex flex-col flex-1">
+                            <!-- Categoría discreta -->
+                            <span class="text-[11px] font-semibold uppercase tracking-wider text-[#007185] mb-1">
+                                ${product.category}
+                            </span>
+
+                            <!-- Título del producto -->
+                            <h3 class="text-sm font-semibold text-[#0f1111] leading-snug line-clamp-2 mb-2 min-h-[2.5rem]">
+                                <button
+                                    type="button"
+                                    onclick="openQuickView('${product.id}')"
+                                    class="text-left hover:text-[#c7511f] transition-colors"
+                                >
+                                    ${escapeHtml(product.title)}
+                                </button>
+                            </h3>
+
+                            <!-- Calificación con estrellas y reseñas -->
+                            <div class="flex items-center gap-1.5 mb-2.5">
+                                <div class="flex items-center" aria-label="Calificación ${product.rating} de 5">
+                                    ${renderStars(product.rating)}
+                                </div>
+                                <span class="text-xs font-semibold text-[#0f1111]">${product.rating.toFixed(1)}</span>
+                                <span class="text-xs text-[#007185]">(${product.reviews.toLocaleString('es-MX')})</span>
+                            </div>
+
+                            <!-- Bloque de Precios -->
+                            <div class="mb-2.5">
+                                <div class="flex items-baseline flex-wrap gap-2">
+                                    ${discount > 0 ? `<span class="text-sm font-bold text-[#cc0c39]">-${discount}%</span>` : ''}
+                                    ${formatAmazonPriceHTML(product.price)}
+                                </div>
+                                ${product.oldPrice ? `
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        Precio de lista: <span class="line-through">${formatCurrency(product.oldPrice)}</span>
+                                    </p>
+                                ` : '<p class="text-xs text-transparent select-none mt-1">.</p>'}
+                            </div>
+
+                            <!-- Insignia Prime y texto de entrega rápida -->
+                            ${product.prime ? `
+                                <div class="flex items-center gap-1.5 text-xs text-gray-700 mb-4">
+                                    <span class="inline-flex items-center font-extrabold italic text-[#00a8e1] text-sm leading-none">
+                                        prime
+                                        <svg class="w-3.5 h-3.5 text-[#ff9900] -ml-0.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    </span>
+                                    <span class="font-medium text-gray-600">${product.deliveryText}</span>
+                                </div>
+                            ` : ''}
+
+                            <!-- Botón Amarillo Característico de Amazon -->
+                            <div class="mt-auto pt-1">
+                                <button
+                                    type="button"
+                                    onclick="addToCart('${product.id}')"
+                                    class="w-full bg-[#ffd814] hover:bg-[#f7ca00] active:bg-[#f0b800] border border-[#fcd200] text-[#0f1111] font-semibold text-sm py-2.5 px-4 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#ff9900]"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                    <span>Agregar al carrito</span>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        /**
+         * ============================================================================
+         * 6. LÓGICA INTERACTIVA DEL CARRITO DE COMPRAS
+         * ============================================================================
+         */
+        function addToCart(productId, quantity = 1) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+
+            const existing = state.cart.find(item => item.id === productId);
+            if (existing) {
+                existing.qty += quantity;
+            } else {
+                state.cart.push({ id: productId, qty: quantity });
+            }
+
+            saveCartToStorage();
+            updateCartUI();
+            animateCartBadge();
+            showToast(`Agregado al carrito: ${product.title}`);
+        }
+
+        function updateCartQty(productId, delta) {
+            const index = state.cart.findIndex(item => item.id === productId);
+            if (index === -1) return;
+
+            state.cart[index].qty += delta;
+            if (state.cart[index].qty <= 0) {
+                state.cart.splice(index, 1);
+            }
+
+            saveCartToStorage();
+            updateCartUI();
+        }
+
+        function removeFromCart(productId) {
+            state.cart = state.cart.filter(item => item.id !== productId);
+            saveCartToStorage();
+            updateCartUI();
+        }
+
+        function clearCart() {
+            state.cart = [];
+            saveCartToStorage();
+            updateCartUI();
+            showToast('Se vació tu carrito de compras', false);
+        }
+
+        function getCartTotals() {
+            let totalItems = 0;
+            let subtotal = 0;
+            state.cart.forEach(item => {
+                const product = PRODUCTS.find(p => p.id === item.id);
+                if (product) {
+                    totalItems += item.qty;
+                    subtotal += product.price * item.qty;
+                }
+            });
+            return { totalItems, subtotal };
+        }
+
+        function updateCartUI() {
+            const { totalItems, subtotal } = getCartTotals();
+
+            // 1. Actualizar contadores en header y drawer
+            document.getElementById('cartBadgeCount').textContent = totalItems;
+            document.getElementById('drawerItemCount').textContent = `(${totalItems})`;
+
+            const container = document.getElementById('cartItemsContainer');
+            const footer = document.getElementById('cartFooter');
+            const freeShippingBanner = document.getElementById('freeShippingBanner');
+
+            // 2. Renderizar estado vacío si no hay artículos
+            if (state.cart.length === 0) {
+                footer.classList.add('hidden');
+                freeShippingBanner.classList.add('hidden');
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center py-12 px-4">
+                        <div class="w-20 h-20 rounded-full bg-gray-200/80 text-gray-400 flex items-center justify-center mb-4">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-base font-bold text-[#0f1111]">Tu carrito de Amazon está vacío</h3>
+                        <p class="text-sm text-gray-600 mt-1 mb-6 max-w-xs">
+                            Explora las Ofertas del Día y agrega tus artículos favoritos para verlos aquí.
+                        </p>
+                        <button
+                            type="button"
+                            onclick="toggleCartDrawer(false); exploreDeals();"
+                            class="bg-[#ffd814] hover:bg-[#f7ca00] text-[#0f1111] font-bold text-sm px-6 py-2.5 rounded-full shadow-sm transition-colors"
+                        >
+                            Ver Ofertas del Día
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // 3. Mostrar barra de envío gratis y pie con subtotal
+            footer.classList.remove('hidden');
+            freeShippingBanner.classList.remove('hidden');
+            document.getElementById('cartSubtotalLabel').textContent = `Subtotal (${totalItems} ${totalItems === 1 ? 'producto' : 'productos'}):`;
+            document.getElementById('cartSubtotalAmount').textContent = `${formatCurrency(subtotal)} MXN`;
+
+            // 4. Renderizar tarjetas de artículos en el carrito
+            container.innerHTML = state.cart.map(item => {
+                const product = PRODUCTS.find(p => p.id === item.id);
+                if (!product) return '';
+
+                return `
+                    <div class="bg-white rounded-xl border border-gray-200 p-3.5 shadow-sm flex gap-3">
+                        <!-- Miniatura con fallback SVG -->
+                        <div class="w-20 h-20 rounded-lg bg-[#f7f8f8] shrink-0 overflow-hidden flex items-center justify-center">
+                            <img
+                                src="${product.image}"
+                                alt="${escapeHtml(product.title)}"
+                                class="w-full h-full object-cover"
+                                onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+                            />
+                            <div class="hidden w-full h-full flex items-center justify-center p-1 scale-75">
+                                ${getFallbackSvg(product.svgType)}
+                            </div>
+                        </div>
+
+                        <!-- Información y controles -->
+                        <div class="flex-1 min-w-0 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-xs sm:text-sm font-semibold text-[#0f1111] line-clamp-2 leading-snug">
+                                    ${escapeHtml(product.title)}
+                                </h4>
+                                <p class="text-sm font-bold text-[#0f1111] mt-1">
+                                    ${formatCurrency(product.price)} <span class="text-[11px] font-normal text-gray-500">c/u</span>
+                                </p>
+                                <span class="inline-block text-[11px] text-[#067d62] font-medium">Disponible · Envío Prime</span>
+                            </div>
+
+                            <!-- Controles de cantidad (+/-) y Eliminar -->
+                            <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-gray-100">
+                                <div class="inline-flex items-center border border-gray-300 rounded-full bg-[#f0f2f2] overflow-hidden">
+                                    <button
+                                        type="button"
+                                        onclick="updateCartQty('${product.id}', -1)"
+                                        aria-label="Disminuir cantidad"
+                                        class="w-8 h-7 flex items-center justify-center text-base font-bold text-[#0f1111] hover:bg-gray-200 transition-colors"
+                                    >
+                                        −
+                                    </button>
+                                    <span class="w-8 text-center text-xs sm:text-sm font-bold bg-white h-7 leading-7 border-x border-gray-200">
+                                        ${item.qty}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onclick="updateCartQty('${product.id}', 1)"
+                                        aria-label="Aumentar cantidad"
+                                        class="w-8 h-7 flex items-center justify-center text-base font-bold text-[#0f1111] hover:bg-gray-200 transition-colors"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onclick="removeFromCart('${product.id}')"
+                                    class="text-xs font-medium text-[#007185] hover:text-[#cc0c39] hover:underline px-2 py-1"
+                                >
+                                    Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function animateCartBadge() {
+            const badge = document.getElementById('cartBadgeCount');
+            badge.classList.add('scale-125');
+            setTimeout(() => badge.classList.remove('scale-125'), 220);
+        }
+
+        function toggleCartDrawer(open) {
+            const drawer = document.getElementById('cartDrawer');
+            const backdrop = document.getElementById('cartBackdrop');
+
+            if (open) {
+                backdrop.classList.remove('hidden');
+                // Forzar reflow para transición suave
+                void backdrop.offsetWidth;
+                backdrop.classList.remove('opacity-0');
+                drawer.classList.remove('translate-x-full');
+                drawer.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('overflow-hidden');
+            } else {
+                backdrop.classList.add('opacity-0');
+                drawer.classList.add('translate-x-full');
+                drawer.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('overflow-hidden');
+                setTimeout(() => {
+                    backdrop.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 7. CHECKOUT SIMULADO Y PEDIDOS DEMO
+         * ============================================================================
+         */
+        function processCheckout() {
+            if (state.cart.length === 0) return;
+
+            const { totalItems, subtotal } = getCartTotals();
+            const orderId = 'AMZ-' + Math.floor(100 + Math.random() * 900) + '-' + Math.floor(100000 + Math.random() * 900000);
+
+            // Calcular fecha estimada de entrega (mañana)
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const deliveryDateStr = tomorrow.toLocaleDateString('es-MX', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long'
+            });
+
+            const orderSummaryItems = state.cart.map(item => {
+                const p = PRODUCTS.find(prod => prod.id === item.id);
+                return { title: p ? p.title : 'Artículo', qty: item.qty, price: p ? p.price : 0 };
+            });
+
+            // Guardar en historial de pedidos demo
+            const newOrder = {
+                id: orderId,
+                date: new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' }),
+                deliveryDate: deliveryDateStr,
+                location: state.location,
+                totalItems,
+                subtotal,
+                items: orderSummaryItems
+            };
+            state.orders.unshift(newOrder);
+            saveOrdersToStorage();
+
+            // Mostrar resumen en el modal de confirmación
+            document.getElementById('checkoutOrderDetails').innerHTML = `
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Número de pedido:</span>
+                    <span class="font-bold text-[#007185]">#${newOrder.id}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Enviar a:</span>
+                    <span class="font-semibold text-[#0f1111]">${escapeHtml(newOrder.location)}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Entrega estimada:</span>
+                    <span class="font-semibold text-[#067d62] capitalize">${deliveryDateStr}</span>
+                </div>
+                <div class="flex justify-between pt-2 border-t border-gray-200">
+                    <span class="font-bold text-[#0f1111]">Total (${totalItems} ${totalItems === 1 ? 'artículo' : 'artículos'}):</span>
+                    <span class="font-extrabold text-[#b12704]">${formatCurrency(subtotal)} MXN</span>
+                </div>
+            `;
+
+            // Limpiar carrito tras confirmar el pedido
+            state.cart = [];
+            saveCartToStorage();
+            updateCartUI();
+
+            // Cerrar carrito y abrir confirmación
+            toggleCartDrawer(false);
+            openModal('checkoutModal');
+        }
+
+        function openOrdersModal() {
+            const container = document.getElementById('ordersListContainer');
+            if (state.orders.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-sm font-semibold text-[#0f1111]">Aún no has realizado pedidos en esta sesión</p>
+                        <p class="text-xs text-gray-500 mt-1">Agrega productos al carrito y pulsa "Proceder al pago" para probar el flujo completo.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = state.orders.map(order => `
+                    <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm space-y-2">
+                        <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-gray-100">
+                            <div>
+                                <span class="text-xs font-bold text-[#007185]">#${order.id}</span>
+                                <span class="text-xs text-gray-500 ml-2">${order.date}</span>
+                            </div>
+                            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#edf7ed] text-[#067d62]">Confirmado</span>
+                        </div>
+                        <ul class="text-xs text-gray-700 space-y-1">
+                            ${order.items.map(it => `<li class="truncate">• <strong>${it.qty}x</strong> ${escapeHtml(it.title)}</li>`).join('')}
+                        </ul>
+                        <div class="flex items-center justify-between pt-2 border-t border-gray-100 text-xs">
+                            <span class="text-gray-500">Destino: ${escapeHtml(order.location)}</span>
+                            <span class="font-bold text-sm text-[#0f1111]">${formatCurrency(order.subtotal)} MXN</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            openModal('ordersModal');
+        }
+
+        /**
+         * ============================================================================
+         * 8. VISTA RÁPIDA DE PRODUCTO, MODALES Y NOTIFICACIONES TOAST
+         * ============================================================================
+         */
+        function openQuickView(productId) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            if (!product) return;
+
+            const discount = getDiscountPercent(product.price, product.oldPrice);
+            const content = document.getElementById('quickViewContent');
+
+            content.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div class="bg-[#f7f8f8] rounded-xl p-4 h-64 sm:h-72 flex items-center justify-center overflow-hidden">
+                        <img
+                            src="${product.image}"
+                            alt="${escapeHtml(product.title)}"
+                            class="w-full h-full object-cover rounded-lg"
+                            onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');"
+                        />
+                        <div class="hidden w-full h-full flex items-center justify-center">
+                            ${getFallbackSvg(product.svgType)}
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-[#007185]">${product.category}</span>
+                            ${product.badge ? `<span class="text-[11px] font-bold px-2 py-0.5 rounded bg-[#c45500] text-white">${product.badge}</span>` : ''}
+                        </div>
+                        <h2 class="text-lg sm:text-xl font-bold text-[#0f1111] leading-snug">${escapeHtml(product.title)}</h2>
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center">${renderStars(product.rating)}</div>
+                            <span class="text-xs font-semibold">${product.rating.toFixed(1)}</span>
+                            <span class="text-xs text-[#007185]">${product.reviews.toLocaleString('es-MX')} calificaciones</span>
+                        </div>
+
+                        <div class="py-2 border-y border-gray-100">
+                            <div class="flex items-baseline gap-2">
+                                ${discount > 0 ? `<span class="text-base font-bold text-[#cc0c39]">-${discount}%</span>` : ''}
+                                ${formatAmazonPriceHTML(product.price)}
+                            </div>
+                            ${product.oldPrice ? `<p class="text-xs text-gray-500 mt-1">Precio de lista: <span class="line-through">${formatCurrency(product.oldPrice)}</span></p>` : ''}
+                        </div>
+
+                        <p class="text-sm text-gray-600 leading-relaxed">${escapeHtml(product.description)}</p>
+
+                        <div class="flex items-center gap-2 text-xs text-gray-700">
+                            <span class="font-extrabold italic text-[#00a8e1] text-sm">prime ✓</span>
+                            <span>${product.deliveryText} a <strong>${escapeHtml(state.location)}</strong></span>
+                        </div>
+
+                        <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
+                            <button
+                                type="button"
+                                onclick="addToCart('${product.id}'); closeModal('productQuickViewModal');"
+                                class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] border border-[#fcd200] text-[#0f1111] font-bold text-sm py-3 rounded-full shadow-sm transition-colors"
+                            >
+                                Agregar al carrito
+                            </button>
+                            <button
+                                type="button"
+                                onclick="addToCart('${product.id}'); closeModal('productQuickViewModal'); toggleCartDrawer(true);"
+                                class="flex-1 bg-[#ffa41c] hover:bg-[#fa8900] text-[#0f1111] font-bold text-sm py-3 rounded-full shadow-sm transition-colors"
+                            >
+                                Comprar ahora
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            openModal('productQuickViewModal');
+        }
+
+        function showToast(message, showCartLink = true) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'pointer-events-auto bg-[#131921] text-white px-4 py-3 rounded-xl shadow-xl border border-gray-700 flex items-center gap-3 max-w-sm w-full sm:w-auto transform translate-y-2 opacity-0 transition-all duration-300';
+            toast.innerHTML = `
+                <span class="w-6 h-6 rounded-full bg-[#067d62] text-white flex items-center justify-center shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </span>
+                <p class="text-xs sm:text-sm font-medium flex-1 line-clamp-2">${escapeHtml(message)}</p>
+                ${showCartLink ? `
+                    <button
+                        type="button"
+                        onclick="toggleCartDrawer(true)"
+                        class="text-xs font-bold text-[#febd69] hover:underline shrink-0"
+                    >
+                        Ver carrito
+                    </button>
+                ` : ''}
+            `;
+
+            container.appendChild(toast);
+
+            // Animar entrada
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            // Auto-cerrar después de 2.8 segundos
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 2800);
+        }
+
+        /**
+         * ============================================================================
+         * 9. CONTROLADORES DE INTERACCIÓN (Búsqueda, Filtros, Ubicación y Modales)
+         * ============================================================================
+         */
+        function selectCategory(category) {
+            state.activeCategory = category;
+            renderCategoryNav();
+            renderProducts();
+        }
+
+        function handleCategorySelectChange(category) {
+            selectCategory(category);
+        }
+
+        function handleLiveSearch(value) {
+            state.searchQuery = value;
+            document.getElementById('clearSearchBtn').classList.toggle('hidden', value.trim() === '');
+            renderProducts();
+        }
+
+        function handleSearchSubmit(event) {
+            event.preventDefault();
+            scrollToCatalog();
+        }
+
+        function clearSearchInput() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            input.focus();
+            handleLiveSearch('');
+        }
+
+        function handleSortChange(value) {
+            state.sortBy = value;
+            renderProducts();
+        }
+
+        function resetAllFilters() {
+            state.activeCategory = 'Todo';
+            state.searchQuery = '';
+            state.sortBy = 'featured';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            document.getElementById('sortSelect').value = 'featured';
+            renderCategoryNav();
+            renderProducts();
+            scrollToTop();
+        }
+
+        function exploreDeals() {
+            selectCategory('Ofertas del Día');
+            scrollToCatalog();
+        }
+
+        function scrollToCatalog() {
+            const el = document.getElementById('catalogSection');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openLocationModal() {
+            openModal('locationModal');
+        }
+
+        function setLocation(city) {
+            state.location = city;
+            saveLocationToStorage();
+            updateLocationUI();
+            closeModal('locationModal');
+            showToast(`Ubicación actualizada a ${city}`, false);
+        }
+
+        function updateLocationUI() {
+            document.getElementById('headerLocationText').textContent = state.location;
+            document.getElementById('mobileLocationText').textContent = state.location;
+        }
+
+        function openInfoModal(type) {
+            const title = document.getElementById('infoModalTitle');
+            const body = document.getElementById('infoModalBody');
+            if (type === 'account') {
+                title.textContent = 'Cuenta y Listas (Demo)';
+                body.textContent = 'En esta versión educativa no es necesario iniciar sesión ni ingresar contraseñas. Tu carrito y pedidos de prueba se guardan localmente en tu navegador.';
+            } else {
+                title.textContent = 'Información de Proyecto Demo';
+                body.textContent = 'Este enlace es representativo del diseño institucional. Explora el catálogo, filtra por categoría, ordena resultados y prueba el carrito interactivo.';
+            }
+            openModal('infoModal');
+        }
+
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Escape seguro de HTML para evitar inyección al renderizar texto del usuario
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Cerrar modales y carrito con tecla Escape o clic fuera del contenido
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                toggleCartDrawer(false);
+                ['checkoutModal', 'productQuickViewModal', 'locationModal', 'ordersModal', 'infoModal'].forEach(closeModal);
+            }
+        });
+
+        ['checkoutModal', 'productQuickViewModal', 'locationModal', 'ordersModal', 'infoModal'].forEach(id => {
+            const modalEl = document.getElementById(id);
+            modalEl.addEventListener('click', (e) => {
+                if (e.target === modalEl) closeModal(id);
+            });
+        });
+
+        /**
+         * ============================================================================
+         * 10. INICIALIZACIÓN AL CARGAR LA PÁGINA
+         * ============================================================================
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            updateLocationUI();
+            renderCategoryNav();
+            renderProducts();
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>
